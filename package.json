@@ -1,0 +1,26 @@
+{
+  "author": "Jesse Stuart <jesse@jessestuart.ca>",
+  "name": "es6-module-mapper",
+  "description": "",
+  "keywords": [
+  ],
+  "version": "0.0.1",
+  "homepage": "http://github.com/jvatic/es6-module-mapper",
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/jvaitc/es6-module-mapper.git"
+  },
+  "license": "BSD",
+  "main": "main.js",
+  "scripts": {
+  },
+  "dependencies": {
+    "recast": "^0.9.5",
+		"es6-promise": "^2.0.1"
+  },
+  "devDependencies": {
+  },
+  "engines": {
+    "node": ">= 0.8"
+  }
+}
