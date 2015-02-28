@@ -10,7 +10,7 @@ Gem::Specification.new do |s|
 
   s.files = Dir['README.md', 'LICENSE', 'lib/**/*.rb']
 
-  s.add_dependency 'sprockets', '3.0.0.beta.6'
+  s.add_dependency 'sprockets', '~> 3.0.0.beta'
   s.add_dependency 'yajl-ruby', '~> 1.2'
 
   s.required_ruby_version = '>= 2.0.0'
