@@ -45,9 +45,9 @@ module ES6ModuleMapper
           cb.call(JSRunner::Event.new(:end))
           transformed_data = event.data["body"]
         when :moduleNameLookup
-          located = locate(event.data["lookupName"], accept: @content_type, bundle: false)
-          name = @environment.find_asset(located).to_hash[:name]
-          @required << located
+          uri, _ = resolve(event.data["lookupName"], accept: @content_type, bundle: false, compat: false)
+          name = @environment.load(uri).to_hash[:name]
+          @required << uri
           cb.call(JSRunner::Event.new(:moduleName, {
             lookupName: event.data["lookupName"],
             name: name
@@ -63,14 +63,13 @@ module ES6ModuleMapper
 
     private
 
-    def locate(path, options = {})
-      method = :locate
+    def resolve(path, options = {})
       if @environment.absolute_path?(path)
         raise Sprockets::FileOutsidePaths, "can't require absolute file: #{path}"
       elsif @environment.relative_path?(path)
         path = expand_relative_path(path)
         if logical_path = @environment.split_subpath(@load_path, path)
-          if filename = @environment.send(method, logical_path, options.merge(load_paths: [@load_path]))
+          if filename = @environment.resolve(logical_path, options.merge(load_paths: [@load_path]))
             filename
           else
             accept = options[:accept]
@@ -82,7 +81,7 @@ module ES6ModuleMapper
           raise Sprockets::FileOutsidePaths, "#{path} isn't under path: #{@load_path}"
         end
       else
-        filename = @environment.send(method, path, options)
+        filename = @environment.resolve(path, options)
       end
 
       if filename
