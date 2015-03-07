@@ -32,6 +32,7 @@ module ES6ModuleMapper
       env = {
         "NODE_PATH" => File.expand_path('../../node_modules', File.dirname(__FILE__))
       }
+      imports = parse_imports
       JSRunner.call(TRANSFORMER_CMD, env) do |event, cb|
         case event.name
         when :start
@@ -39,19 +40,12 @@ module ES6ModuleMapper
             modulesGlobalVarName: MODULES_GLOBAL_VAR_NAME,
             modulesLocalVarName: MODULES_LOCAL_VAR_NAME,
             moduleName: @name,
+            imports: imports,
             body: @input_data
           }))
         when :transformed
           cb.call(JSRunner::Event.new(:end))
           transformed_data = event.data["body"]
-        when :moduleNameLookup
-          uri, _ = resolve(event.data["lookupName"], accept: @content_type, bundle: false, compat: false)
-          name = @environment.load(uri).to_hash[:name]
-          @required << uri
-          cb.call(JSRunner::Event.new(:moduleName, {
-            lookupName: event.data["lookupName"],
-            name: name
-          }))
         end
       end
 
@@ -62,6 +56,17 @@ module ES6ModuleMapper
     end
 
     private
+
+    def parse_imports
+      @input_data.scan(/^import .*$/).inject({}) do |imports, line|
+        lookup_name = line.match(/from[^'"]+(['"])([^\1]+)\1/)[2]
+        uri, _ = resolve(lookup_name, accept: @content_type, bundle: false, compat: false)
+        @required << uri
+        name = @environment.load(uri).to_hash[:name]
+        imports[lookup_name] = name
+        imports
+      end
+    end
 
     def resolve(path, options = {})
       if @environment.absolute_path?(path)
