@@ -1,4 +1,5 @@
 require 'es6-module-mapper/js_runner'
+require 'yajl'
 
 module ES6ModuleMapper
   class Processor
@@ -30,27 +31,16 @@ module ES6ModuleMapper
     end
 
     def transform
-      transformed_data = nil
-      env = {
-        "NODE_PATH" => File.expand_path('../../node_modules', File.dirname(__FILE__))
-      }
       @logger.info "Processing #{@name}"
-      imports = parse_imports
-      JSRunner.call(TRANSFORMER_CMD, env) do |event, cb|
-        case event.name
-        when :start
-          cb.call(JSRunner::Event.new(:transform, {
-            modulesGlobalVarName: MODULES_GLOBAL_VAR_NAME,
-            modulesLocalVarName: MODULES_LOCAL_VAR_NAME,
-            moduleName: @name,
-            imports: imports,
-            body: @input_data
-          }))
-        when :transformed
-          cb.call(JSRunner::Event.new(:end))
-          transformed_data = event.data["body"]
-        end
-      end
+
+      env = {
+        "NODE_PATH" => File.expand_path('../../node_modules', File.dirname(__FILE__)),
+        "MODULES_GLOBAL_VAR_NAME" => MODULES_GLOBAL_VAR_NAME,
+        "MODULES_LOCAL_VAR_NAME" => MODULES_LOCAL_VAR_NAME,
+        "IMPORT_MAPPING" => Yajl::Encoder.encode(parse_imports),
+        "MODULE_NAME" => @name
+      }
+      transformed_data = JSRunner.call(TRANSFORMER_CMD, @input_data, env, @logger)
 
       {
         data: transformed_data,
