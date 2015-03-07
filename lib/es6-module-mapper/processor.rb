@@ -22,6 +22,8 @@ module ES6ModuleMapper
       @dirname      = File.dirname(input[:filename])
       @content_type = input[:content_type]
 
+      @logger = @environment.logger
+
       @input_data = input[:data]
 
       @required = Set.new(input[:metadata][:required])
@@ -32,6 +34,7 @@ module ES6ModuleMapper
       env = {
         "NODE_PATH" => File.expand_path('../../node_modules', File.dirname(__FILE__))
       }
+      @logger.info "Processing #{@name}"
       imports = parse_imports
       JSRunner.call(TRANSFORMER_CMD, env) do |event, cb|
         case event.name
