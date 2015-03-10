@@ -8,7 +8,7 @@ Gem::Specification.new do |s|
   s.description = s.summary
   s.license = 'BSD'
 
-  s.files = Dir['README.md', 'LICENSE', 'lib/**/*.rb']
+  s.files = Dir['README.md', 'LICENSE', 'lib/**/*.rb', 'lib/**/*.js']
 
   s.add_dependency 'sprockets', '~> 3.0.0.beta'
   s.add_dependency 'yajl-ruby', '~> 1.2'
