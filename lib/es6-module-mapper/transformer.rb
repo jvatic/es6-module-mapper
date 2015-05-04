@@ -12,6 +12,10 @@ module ES6ModuleMapper
 
     def self.call(input)
       logger = input[:environment].logger
+      if input[:metadata][:import_mapping].keys.size == 0 && input[:data].match(/^export\s/).nil?
+        logger.info "Skipping transform for #{input[:name]}"
+        return { data: input[:data] }
+      end
       logger.info "Transforming #{input[:name]}"
 
       env = {
