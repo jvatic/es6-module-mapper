@@ -30,6 +30,9 @@ module ES6ModuleMapper
         required: @required,
         import_mapping: parse_imports,
       }
+    rescue => e
+      @logger.debug "Failed to parse #{@name}"
+      raise e
     end
 
     private
@@ -38,6 +41,9 @@ module ES6ModuleMapper
       @input_data.scan(/^import .*$/).inject({}) do |imports, line|
         lookup_name = line.match(/from[^'"]+(['"])([^\1]+)\1/)[2]
         uri, _ = resolve(lookup_name, accept: @content_type, bundle: false, compat: false)
+        if uri.nil?
+          raise "Failed to parse #{@name}: #{lookup_name} not found"
+        end
         @required << uri
         name = @environment.load(uri).to_hash[:name]
         imports[lookup_name] = name

@@ -27,6 +27,9 @@ module ES6ModuleMapper
       }
 
       { data: JSRunner.call(TRANSFORMER_CMD, input[:data], env, logger) }
+    rescue => e
+      logger.debug "Transform failed for #{input[:name]}"
+      raise e
     end
   end
 end
