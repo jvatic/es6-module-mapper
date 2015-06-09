@@ -40,7 +40,7 @@ module ES6ModuleMapper
     def parse_imports
       @input_data.scan(/^import .*$/).inject({}) do |imports, line|
         lookup_name = line.match(/from[^'"]+(['"])([^\1]+)\1/)[2]
-        uri, _ = resolve(lookup_name, accept: @content_type, bundle: false, compat: false)
+        uri, _ = resolve(lookup_name, accept: @content_type, pipeline: "self", compat: false)
         if uri.nil?
           raise "Failed to parse #{@name}: #{lookup_name} not found"
         end
