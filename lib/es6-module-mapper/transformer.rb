@@ -7,7 +7,7 @@ module ES6ModuleMapper
     NODEJS_CMD = %w[node nodejs].map { |cmd| %x{which #{cmd}}.chomp }.find { |cmd| !cmd.empty? }
     TRANSFORMER_CMD = "#{NODEJS_CMD} #{File.join(File.dirname(__FILE__), 'transformer.js')}"
 
-    MODULES_GLOBAL_VAR_NAME = 'window.____modules____'
+    MODULES_GLOBAL_VAR_NAME = 'this.____modules____'
     MODULES_LOCAL_VAR_NAME = '__m__'
 
     def self.call(input)
